@@ -10,7 +10,7 @@ from datetime import datetime
 from tqdm import tqdm
 import csv
 
-# 🔥 로그 출력 함수
+# 로그 출력되게
 def log_print(message, log_file):
     print(message)
     with open(log_file, 'a', encoding='utf-8') as f:
@@ -125,7 +125,7 @@ def train(model, dataloader, optimizer, loss_fn, log_file):
 def validate(model, dataloader, loss_fn, log_file):
     model.eval()
     total_loss = 0
-    log_print(f"🔍 Validation 시작: {len(dataloader)} batch", log_file)
+    log_print(f"Validation 시작: {len(dataloader)} batch", log_file)
     with torch.no_grad():
         for input_ids_1, mask_1, input_ids_2, mask_2, target, _, _ in tqdm(dataloader, desc="Validation"):
             vec1 = model(input_ids_1.squeeze(1), mask_1.squeeze(1))
@@ -167,20 +167,18 @@ def evaluate(model, dataloader, log_file, threshold=0.5, output_dir="results"):
     log_print(f"\n[전체 정확도]\n▶ 정확도: {total_acc*100:.2f}% (TP={total_TP}, TN={total_TN}, FP={total_FP}, FN={total_FN})", log_file)
     return total_acc
 
-# 🚀 실행 준비
-device = torch.device("cpu")  # 노트북: CPU 전용
+device = torch.device("cpu")  
 output_dir = r"D:\dayeon"
 os.makedirs(output_dir, exist_ok=True)
 log_file = os.path.join(output_dir, "training_log.txt")
 with open(log_file, 'w', encoding='utf-8') as f:
     f.write(f"📅 Training Log Start: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-log_print(f"💻 평가 디바이스: {device}", log_file)
 
 model = MusicBERTEmbedding(vocab_size=5000).to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
 loss_fn = nn.CosineEmbeddingLoss()
 
-train_files = collect_midi_files(r'D:\02.라벨링데이터\VL', log_file)  # 전체 VL 폴더 대상으로
+train_files = collect_midi_files(r'D:\02.라벨링데이터\VL', log_file)
 val_files = collect_midi_files(r'D:\02.라벨링데이터\VL', log_file)
 train_dataset = MIDISimilarityDataset(train_files, device=device)
 val_dataset = MIDISimilarityDataset(val_files, device=device)
@@ -193,11 +191,11 @@ for epoch in range(epochs):
     log_print(f"\n🌀 Epoch {epoch+1}/{epochs} 시작: {datetime.now().strftime('%H:%M:%S')}", log_file)
     train_loss = train(model, train_loader, optimizer, loss_fn, log_file)
     val_loss = validate(model, val_loader, loss_fn, log_file)
-    log_print(f"🎯 Epoch {epoch+1} 완료: {datetime.now().strftime('%H:%M:%S')}, Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}", log_file)
+    log_print(f" Epoch {epoch+1} 완료: {datetime.now().strftime('%H:%M:%S')}, Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}", log_file)
 
 log_print(f"\n🏁 Training 완료: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", log_file)
 torch.save(model.state_dict(), os.path.join(output_dir, 'musicbert_model.pt'))
-log_print("💾 모델 저장 완료", log_file)
+log_print(" 모델 저장 완료", log_file)
 
 # 평가
 evaluate(model, val_loader, log_file, threshold=0.5, output_dir=output_dir)
