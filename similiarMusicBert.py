@@ -141,14 +141,12 @@ def validate(model, dataloader, loss_fn, log_file):
     log_print(f"📈 Validation Accuracy: {avg_acc:.4f}", log_file)
     return avg_loss, avg_acc
 
-# 🚀 실행 준비
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 log_file = "training_log.txt"
 model_save_dir = "saved_models"
 os.makedirs(model_save_dir, exist_ok=True)
 with open(log_file, 'w', encoding='utf-8') as f:
     f.write(f"📅 Training Log Start: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-log_print(f"💻 사용 중인 디바이스: {device}", log_file)
 
 model = MusicBERTEmbedding(vocab_size=5000).to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
@@ -167,14 +165,12 @@ for epoch in range(epochs):
     log_print(f"\n🌀 Epoch {epoch+1}/{epochs} 시작: {datetime.now().strftime('%H:%M:%S')}", log_file)
     train_loss, train_acc = train(model, train_loader, optimizer, loss_fn, log_file)
     val_loss, val_acc = validate(model, val_loader, loss_fn, log_file)
-    log_print(f"🎯 Epoch {epoch+1} 완료: {datetime.now().strftime('%H:%M:%S')}, "
+    log_print(f" Epoch {epoch+1} 완료: {datetime.now().strftime('%H:%M:%S')}, "
               f"Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}, "
               f"Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}", log_file)
     
-    # 🌟 중간중간 모델 저장
     model_save_path = os.path.join(model_save_dir, f"model_epoch{epoch+1}.pt")
     torch.save(model.state_dict(), model_save_path)
-    log_print(f"💾 모델 저장됨: {model_save_path}", log_file)
 
 # 🌟 최종 모델 저장
 final_model_path = os.path.join(model_save_dir, "model_final.pt")
